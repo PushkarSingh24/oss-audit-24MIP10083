@@ -1,0 +1,94 @@
+#!/bin/bash
+# ============================================================
+# Script 5: Open Source Manifesto Generator
+# Author: Pushkar Singh | Roll No: 24MIP10083
+# Course: Open Source Software
+# Description: Interactively asks the user 3 questions and
+#              generates a personalised OSS philosophy statement,
+#              saving it to a .txt file.
+# ============================================================
+
+# --- Aliases demonstration ---
+# In a real shell session, you'd define these as:
+#   alias today='date +%d\ %B\ %Y'
+#   alias greet='echo Hello from the open source world'
+# Here we simulate the effect with variables and functions
+
+# --- Function to draw a separator line (reusable, DRY principle) ---
+draw_line() {
+    echo "------------------------------------------------------------"
+}
+
+# --- Welcome message ---
+echo "============================================================"
+echo "       OPEN SOURCE MANIFESTO GENERATOR"
+echo "============================================================"
+echo ""
+echo "  Answer three questions below."
+echo "  Your personal open source manifesto will be generated"
+echo "  and saved as a .txt file."
+echo ""
+draw_line
+
+# --- Read user input interactively ---
+# read -p displays a prompt and waits for input
+
+read -p "  1. Name one open-source tool you use every day: " TOOL
+echo ""
+read -p "  2. In one word, what does 'freedom' mean to you? " FREEDOM
+echo ""
+read -p "  3. Name one thing you would build and share freely: " BUILD
+echo ""
+
+# --- Get current date and username for the file ---
+DATE=$(date '+%d %B %Y')          # e.g. 28 March 2026
+USERNAME=$(whoami)                 # Current user
+OUTPUT="manifesto_${USERNAME}.txt" # Output filename includes username
+
+draw_line
+echo ""
+echo "  Generating your manifesto..."
+echo ""
+
+# --- Compose the manifesto by writing to file with > (create/overwrite) ---
+# and >> (append subsequent lines)
+
+# Write the header first (> creates/overwrites the file)
+echo "============================================================" > "$OUTPUT"
+echo "           MY OPEN SOURCE MANIFESTO" >> "$OUTPUT"
+echo "  By: $USERNAME | Date: $DATE" >> "$OUTPUT"
+echo "============================================================" >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+
+# --- Main manifesto paragraph using string concatenation of variables ---
+echo "  Every day, I rely on $TOOL to get things done." >> "$OUTPUT"
+echo "  To me, it represents more than just software — it is a" >> "$OUTPUT"
+echo "  tool built by people who believed that $FREEDOM matters" >> "$OUTPUT"
+echo "  more than profit. Without that choice, I would not have" >> "$OUTPUT"
+echo "  access to it at all." >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+echo "  Open source taught me something that no proprietary" >> "$OUTPUT"
+echo "  product ever could: that sharing knowledge does not" >> "$OUTPUT"
+echo "  diminish it. It multiplies it. When I look at $TOOL," >> "$OUTPUT"
+echo "  I see thousands of contributors who chose to give" >> "$OUTPUT"
+echo "  something back rather than lock it away." >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+echo "  That is why, one day, I want to build $BUILD and release" >> "$OUTPUT"
+echo "  it openly — not because I have to, but because I believe" >> "$OUTPUT"
+echo "  that the best software is built together, in the open," >> "$OUTPUT"
+echo "  for everyone. Standing on the shoulders of giants means" >> "$OUTPUT"
+echo "  giving the next person a taller place to stand." >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+echo "------------------------------------------------------------" >> "$OUTPUT"
+echo "  'Free software is a matter of liberty, not price.'" >> "$OUTPUT"
+echo "                                    — Richard M. Stallman" >> "$OUTPUT"
+echo "============================================================" >> "$OUTPUT"
+
+# --- Confirmation message ---
+echo "  Manifesto saved to: $OUTPUT"
+echo ""
+draw_line
+echo ""
+
+# --- Display the generated file to the terminal ---
+cat "$OUTPUT"
