@@ -1,112 +1,29 @@
 #!/bin/bash
-# ============================================================
-# Script 2: FOSS Package Inspector
-# Author: Pushkar Singh | Roll No: 24MIP10083
-# Course: Open Source Software
-# Description: Checks if Firefox (or other packages) is
-#              installed, shows version + license info,
-#              and prints a philosophy note via case statement.
-# ============================================================
+# Script 2: FOSS Package Inspector (Clean Version)
 
-# --- Package to inspect (set to firefox for this project) ---
-PACKAGE="firefox"
+PACKAGE="code"
 
-echo "============================================================"
-echo "          FOSS PACKAGE INSPECTOR"
-echo "============================================================"
-echo ""
+echo "Checking package: $PACKAGE"
+echo "--------------------------"
 
-# --- Check if the package manager available and detect package ---
-# Tries dpkg first (Debian/Ubuntu), then rpm (Fedora/RHEL/CentOS)
+# Check if VS Code is installed
+if command -v code &> /dev/null; then
+    echo "VS Code is installed."
 
-if command -v dpkg &>/dev/null; then
-    # dpkg-based system (Ubuntu, Debian, Kali, etc.)
-    if dpkg -l "$PACKAGE" 2>/dev/null | grep -q "^ii"; then
-        echo "  [FOUND] $PACKAGE is installed on this system."
-        echo ""
-        echo "  --- Package Details ---"
-        # Extract version and description from dpkg
-        dpkg -l "$PACKAGE" | grep "^ii" | awk '{print "  Version     : " $3}'
-        dpkg -s "$PACKAGE" 2>/dev/null | grep -E '^(Version|Maintainer|Homepage)' | \
-            awk -F': ' '{printf "  %-12s: %s\n", $1, $2}'
-    else
-        echo "  [NOT FOUND] $PACKAGE is NOT installed via dpkg."
-        echo "  Try: sudo apt install $PACKAGE"
-    fi
+    # Show version
+    code --version | head -n 1
 
-elif command -v rpm &>/dev/null; then
-    # rpm-based system (Fedora, CentOS, RHEL)
-    if rpm -q "$PACKAGE" &>/dev/null; then
-        echo "  [FOUND] $PACKAGE is installed on this system."
-        echo ""
-        echo "  --- Package Details ---"
-        # Show version, license, and summary from rpm database
-        rpm -qi "$PACKAGE" | grep -E 'Version|License|Summary|URL' | \
-            awk -F': ' '{printf "  %-12s: %s\n", $1, $2}'
-    else
-        echo "  [NOT FOUND] $PACKAGE is NOT installed via rpm."
-        echo "  Try: sudo dnf install $PACKAGE"
-    fi
-
+    # Show path
+    echo "Location: $(which code)"
 else
-    # Fallback: check if the binary exists anywhere in PATH
-    echo "  [INFO] No dpkg or rpm found. Checking binary in PATH..."
-    if command -v "$PACKAGE" &>/dev/null; then
-        echo "  [FOUND] $PACKAGE binary found at: $(which $PACKAGE)"
-        # Try to get version from the binary itself
-        "$PACKAGE" --version 2>/dev/null | head -1 && true
-    else
-        echo "  [NOT FOUND] $PACKAGE binary not found in PATH either."
-    fi
+    echo "VS Code is NOT installed."
 fi
 
-echo ""
-echo "------------------------------------------------------------"
-echo "  OPEN SOURCE PHILOSOPHY NOTE"
-echo "------------------------------------------------------------"
-
-# --- Case statement: print a philosophy note based on package name ---
-case "$PACKAGE" in
-    firefox)
-        echo "  Firefox (MPL 2.0):"
-        echo "  Mozilla built Firefox because Internet Explorer had a"
-        echo "  near-monopoly and the open web was at risk. Firefox"
-        echo "  proved that a nonprofit could build a world-class browser"
-        echo "  driven by community values, not advertising clicks."
-        ;;
-    httpd|apache2)
-        echo "  Apache HTTP Server (Apache 2.0):"
-        echo "  Apache built the open internet — it powered the majority"
-        echo "  of all websites during the web's most formative years."
-        echo "  Its permissive license lets companies use it freely."
-        ;;
-    mysql|mysql-server)
-        echo "  MySQL (GPL v2 / Commercial):"
-        echo "  MySQL's dual licensing tells a fascinating story about"
-        echo "  how open source and commercial interests can coexist —"
-        echo "  or clash, as Sun and Oracle acquisitions showed."
-        ;;
-    python3|python)
-        echo "  Python (PSF License):"
-        echo "  A language shaped entirely by its community, Python shows"
-        echo "  that open governance can produce software used by billions."
-        ;;
-    git)
-        echo "  Git (GPL v2):"
-        echo "  Linus built Git in two weeks after BitKeeper revoked its"
-        echo "  free license for Linux development. A perfect example of"
-        echo "  why depending on proprietary tools is risky."
-        ;;
-    vlc)
-        echo "  VLC (LGPL/GPL):"
-        echo "  Student project from Paris that became the world's most"
-        echo "  versatile media player. Pure open source success story."
-        ;;
-    *)
-        echo "  $PACKAGE: An open-source tool contributing to the shared"
-        echo "  digital commons that modern software is built upon."
-        ;;
+# Case statement
+case $PACKAGE in
+    code) echo "VS Code: a lightweight, extensible open-source editor" ;;
+    git) echo "Git: version control system built for collaboration" ;;
+    nginx) echo "Nginx: high-performance web server" ;;
+    python) echo "Python: powerful open-source programming language" ;;
+    *) echo "Unknown package" ;;
 esac
-
-echo ""
-echo "============================================================"
