@@ -1,0 +1,58 @@
+#!/bin/bash
+# ============================================================
+# Script 1: System Identity Report
+# Author: Pushkar Singh | Roll No: 24MIP10083
+# Course: Open Source Software
+# Description: Displays a welcome screen with system info
+#              relevant to the OSS Audit project on Firefox.
+# ============================================================
+
+# --- Student and project variables ---
+STUDENT_NAME="Pushkar Singh"
+ROLL_NO="24MIP10083"
+SOFTWARE_CHOICE="Firefox"
+SOFTWARE_LICENSE="Mozilla Public License 2.0 (MPL 2.0)"
+
+# --- Gather system information using command substitution ---
+KERNEL=$(uname -r)                            # Kernel version
+DISTRO=$(cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '"')  # Distro name
+USER_NAME=$(whoami)                           # Current logged-in user
+HOME_DIR=$HOME                                # Home directory of current user
+UPTIME=$(uptime -p)                           # Human-readable uptime
+CURRENT_DATE=$(date '+%A, %d %B %Y')          # e.g. Saturday, 28 March 2026
+CURRENT_TIME=$(date '+%H:%M:%S')              # Current time in HH:MM:SS
+
+# --- OS License detection (basic check based on distro) ---
+# Most Linux distros use GPL v2 for the kernel
+OS_LICENSE="GNU General Public License v2 (GPL v2)"
+
+# --- Display the welcome banner ---
+echo "============================================================"
+echo "         OPEN SOURCE AUDIT — SYSTEM IDENTITY REPORT        "
+echo "============================================================"
+echo ""
+echo "  Student  : $STUDENT_NAME"
+echo "  Roll No  : $ROLL_NO"
+echo "  Software : $SOFTWARE_CHOICE  |  License: $SOFTWARE_LICENSE"
+echo ""
+echo "------------------------------------------------------------"
+echo "  SYSTEM DETAILS"
+echo "------------------------------------------------------------"
+echo "  Distribution : $DISTRO"
+echo "  Kernel       : $KERNEL"
+echo "  Logged in as : $USER_NAME"
+echo "  Home Dir     : $HOME_DIR"
+echo "  Uptime       : $UPTIME"
+echo "  Date         : $CURRENT_DATE"
+echo "  Time         : $CURRENT_TIME"
+echo ""
+echo "------------------------------------------------------------"
+echo "  OS LICENSE"
+echo "------------------------------------------------------------"
+echo "  This system runs Linux, which is covered under:"
+echo "  $OS_LICENSE"
+echo ""
+echo "  This means you are free to run, study, modify, and"
+echo "  redistribute the Linux kernel — the four freedoms"
+echo "  that the Free Software Foundation stands for."
+echo "============================================================"
