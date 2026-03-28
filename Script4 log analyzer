@@ -1,0 +1,98 @@
+#!/bin/bash
+# ============================================================
+# Script 4: Log File Analyzer
+# Author: Pushkar Singh | Roll No: 24MIP10083
+# Course: Open Source Software
+# Description: Reads a log file line by line, counts how many
+#              lines match a keyword, and prints the last 5.
+#              Accepts log file path and keyword as arguments.
+# Usage: ./script4_log_analyzer.sh <logfile> [keyword]
+# ============================================================
+
+# --- Command-line arguments ---
+# $1 = path to log file
+# $2 = keyword to search for (defaults to "error" if not provided)
+LOGFILE=$1
+KEYWORD=${2:-"error"}   # Default keyword is 'error' if not supplied
+
+# --- Counter variable to track matching lines ---
+COUNT=0
+MAX_RETRIES=3           # Maximum number of retry attempts if file is empty
+ATTEMPT=0               # Retry attempt counter
+
+echo "============================================================"
+echo "          LOG FILE ANALYZER"
+echo "============================================================"
+
+# --- Validate that a log file path was provided ---
+if [ -z "$LOGFILE" ]; then
+    echo "  Usage: $0 <logfile> [keyword]"
+    echo "  Example: $0 /var/log/syslog error"
+    exit 1
+fi
+
+# --- do-while style retry loop: keep trying until file has content ---
+# This handles cases where the log file exists but may be empty or still
+# being written to (common with rotating logs)
+while true; do
+    ATTEMPT=$((ATTEMPT + 1))
+
+    # Check if the file actually exists
+    if [ ! -f "$LOGFILE" ]; then
+        echo "  [ERROR] File not found: $LOGFILE"
+        exit 1
+    fi
+
+    # Check if the file has any content (size > 0)
+    if [ -s "$LOGFILE" ]; then
+        # File has content — break out of the retry loop
+        break
+    else
+        # File is empty
+        if [ "$ATTEMPT" -ge "$MAX_RETRIES" ]; then
+            echo "  [WARNING] $LOGFILE is empty after $MAX_RETRIES attempts. Exiting."
+            exit 1
+        fi
+        echo "  [RETRY $ATTEMPT/$MAX_RETRIES] File is empty. Waiting 2 seconds..."
+        sleep 2
+    fi
+done
+
+echo "  Log File : $LOGFILE"
+echo "  Keyword  : '$KEYWORD'"
+echo ""
+
+# --- Read log file line by line using while-read loop ---
+# IFS= preserves leading/trailing whitespace in each line
+# -r flag prevents backslash interpretation
+while IFS= read -r LINE; do
+    # Case-insensitive check: does this line contain our keyword?
+    if echo "$LINE" | grep -iq "$KEYWORD"; then
+        COUNT=$((COUNT + 1))   # Increment match counter
+    fi
+done < "$LOGFILE"
+
+# --- Print summary result ---
+echo "  Total lines scanned : $(wc -l < "$LOGFILE")"
+echo "  Matches for keyword : $COUNT occurrence(s) of '$KEYWORD'"
+echo ""
+
+# --- Show the last 5 matching lines for context ---
+echo "------------------------------------------------------------"
+echo "  LAST 5 MATCHING LINES:"
+echo "------------------------------------------------------------"
+
+# Use grep with -i (case-insensitive) and pipe to tail to get last 5
+MATCHES=$(grep -i "$KEYWORD" "$LOGFILE" | tail -5)
+
+if [ -z "$MATCHES" ]; then
+    echo "  No matching lines found."
+else
+    # Print each of the last 5 matches with a line prefix
+    echo "$MATCHES" | while IFS= read -r MATCH_LINE; do
+        echo "  >> $MATCH_LINE"
+    done
+fi
+
+echo ""
+echo "============================================================"
