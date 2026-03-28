@@ -1,0 +1,83 @@
+#!/bin/bash
+# ============================================================
+# Script 3: Disk and Permission Auditor
+# Author: Pushkar Singh | Roll No: 24MIP10083
+# Course: Open Source Software
+# Description: Loops through key system directories and
+#              reports permissions, ownership, and disk usage.
+#              Also checks Firefox's config directory.
+# ============================================================
+
+# --- List of important system directories to audit ---
+DIRS=("/etc" "/var/log" "/home" "/usr/bin" "/tmp" "/opt")
+
+echo "============================================================"
+echo "         DISK AND PERMISSION AUDITOR"
+echo "============================================================"
+printf "%-20s %-30s %-8s\n" "Directory" "Perms | Owner | Group" "Size"
+echo "------------------------------------------------------------"
+
+# --- Loop through each directory in the list ---
+for DIR in "${DIRS[@]}"; do
+    if [ -d "$DIR" ]; then
+        # Extract permissions, owner, and group from ls -ld output
+        # awk fields: $1=perms, $3=owner, $4=group
+        PERMS=$(ls -ld "$DIR" | awk '{print $1}')
+        OWNER=$(ls -ld "$DIR" | awk '{print $3}')
+        GROUP=$(ls -ld "$DIR" | awk '{print $4}')
+
+        # du -sh gives human-readable size; 2>/dev/null suppresses permission errors
+        SIZE=$(du -sh "$DIR" 2>/dev/null | cut -f1)
+
+        printf "%-20s %-30s %-8s\n" "$DIR" "$PERMS | $OWNER | $GROUP" "$SIZE"
+    else
+        # Directory does not exist on this system
+        printf "%-20s %-30s\n" "$DIR" "[does not exist on this system]"
+    fi
+done
+
+echo ""
+echo "------------------------------------------------------------"
+echo "  FIREFOX CONFIG DIRECTORY CHECK"
+echo "------------------------------------------------------------"
+
+# --- Firefox stores user profiles in ~/.mozilla/firefox ---
+# This is where bookmarks, extensions, and prefs are kept
+FIREFOX_CONFIG="$HOME/.mozilla/firefox"
+FIREFOX_CACHE="$HOME/.cache/mozilla/firefox"
+
+# Check user-level Firefox config directory
+if [ -d "$FIREFOX_CONFIG" ]; then
+    FF_PERMS=$(ls -ld "$FIREFOX_CONFIG" | awk '{print $1, $3, $4}')
+    FF_SIZE=$(du -sh "$FIREFOX_CONFIG" 2>/dev/null | cut -f1)
+    echo "  Config Dir  : $FIREFOX_CONFIG"
+    echo "  Permissions : $FF_PERMS"
+    echo "  Size        : $FF_SIZE"
+
+    # Count how many profiles exist
+    PROFILE_COUNT=$(find "$FIREFOX_CONFIG" -maxdepth 1 -type d | tail -n +2 | wc -l)
+    echo "  Profiles    : $PROFILE_COUNT profile(s) found"
+else
+    echo "  Firefox config directory not found at: $FIREFOX_CONFIG"
+    echo "  Firefox may not be installed or has not been launched yet."
+fi
+
+# Check the system-wide Firefox binary location
+echo ""
+echo "  System Firefox Binary:"
+if command -v firefox &>/dev/null; then
+    FF_BIN=$(which firefox)
+    FF_BIN_PERMS=$(ls -l "$FF_BIN" | awk '{print $1, $3, $4}')
+    echo "  Binary path : $FF_BIN"
+    echo "  Permissions : $FF_BIN_PERMS"
+else
+    echo "  Firefox binary not found in PATH."
+fi
+
+echo ""
+echo "============================================================"
+echo "  NOTE: World-writable directories like /tmp (perms: drwxrwxrwt)"
+echo "  use the sticky bit (t) so only file owners can delete their files."
+echo "  Directories like /usr/bin (owned by root) protect system binaries"
+echo "  from being modified by regular users — a core Linux security model."
+echo "============================================================"
