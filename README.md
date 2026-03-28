@@ -7,13 +7,6 @@
 **Licence:** Mozilla Public License 2.0 (MPL 2.0)
 
 ---
-
-## About This Project
-
-This repository is the shell script submission for the Open Source Audit capstone project. The project involves a structured audit of Mozilla Firefox — covering its origin story, licence analysis, Linux footprint, ecosystem, and a comparison with proprietary alternatives. The full written report is submitted separately on the VITyarthi portal.
-
----
-
 ## Repository Structure
 
 ```
